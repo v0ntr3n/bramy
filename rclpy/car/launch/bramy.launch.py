@@ -6,7 +6,7 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='bramy',
-            executable='publisher',
+            executable='camera_publisher',
             name='publisher_node'
         ),
         Node(
