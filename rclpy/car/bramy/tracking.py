@@ -1,0 +1,99 @@
+import threading
+
+import cv2
+import numpy
+import onnxruntime as ort
+from bl_msg.msg import Control
+from cv_bridge import CvBridge
+from sensor_msgs.msg import Image
+from utils import from_numpy, letterbox, non_max_suppression, scale_coords
+
+import rclpy
+from rclpy.node import Node
+
+
+#640 640
+class tracking(Node):
+    def __init__(self):
+        super().__init__('tracking')
+        self.angle = 0
+        self.get_logger().info("load model")
+        self.model = ort.InferenceSession(
+            r"alexnet.onnx", providers=["CPUExecutionProvider"])
+        self.get_logger().info("load model complete")
+        
+        self.publisher_ = self.create_publisher(Control, 'get_control', 1)
+        self.bridge = CvBridge()
+        self.node.create_subscription(
+            Image,
+            'color_image',
+            self._rgb_callback,
+            1  # QoS: queue size
+        )
+
+        # Subscriber for depth image
+        self.node.create_subscription(
+            Image,
+            'depth_image',
+            self._depth_callback,
+            1  # QoS: queue size
+        )
+        
+        threading.Thread(target=self.detect)
+
+    def _rgb_callback(self, msg):
+        """
+        Callback for the color image topic.
+        Converts the ROS Image message to OpenCV format (BGR8).
+        """
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            with self._rgb_lock:
+                self._rgb_image = cv_image
+        except Exception as e:
+            self.node.get_logger().error(f'Error converting RGB image: {e}')
+            with self._rgb_lock:
+                self._rgb_image = None
+
+    def _depth_callback(self, msg):
+        """
+        Callback for the depth image topic.
+        Converts the ROS Image message to OpenCV format (passthrough).
+        """
+        try:
+            # Use "passthrough" to retain the original format of the depth image (e.g., 16UC1, 32FC1)
+            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
+            with self._depth_lock:
+                self._depth_image = cv_image
+        except Exception as e:
+            self.node.get_logger().error(f'Error converting Depth image: {e}')
+            with self._depth_lock:
+                self._depth_image = None
+    
+    def detect(self, im):
+        im0, img = self.preprocess(im)
+
+        pred = self.model.run(self.output_names, {self.inputName: img})
+        pred = from_numpy(pred[0])
+        pred = pred.float()
+        pred = non_max_suppression(pred, self.threshold, 0.4)
+        pred_boxes = []
+        for det in pred:
+            if det is not None and len(det):
+                det[:, :4] = scale_coords(
+                    img.shape[2:], det[:, :4], im0.shape).round()
+                for *x, conf, cls_id in det:
+                    x1, y1 = int(x[0]), int(x[1])
+                    x2, y2 = int(x[2]), int(x[3])
+                    pred_boxes.append(
+                        (x1, y1, x2, y2, conf))
+        return pred_boxes
+        
+def main(arg=None):
+    rclpy.init()
+    node = tracking()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
