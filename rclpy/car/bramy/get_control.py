@@ -1,7 +1,7 @@
 import struct
 
 import can
-from bl_msg.msg import Control
+from std_msgs.msg import Float32MultiArray
 
 import rclpy
 from rclpy.node import Node
@@ -14,7 +14,7 @@ class get_control(Node):
         self.speed = 0
         self.angle = 90
         self.set_value()
-        self.subcriber_ = self.create_subscription(Control, 
+        self.subcriber_ = self.create_subscription(Float32MultiArray, 
                                                    'get_control', 
                                                    self.control, 
                                                    1)
@@ -31,6 +31,8 @@ class get_control(Node):
             print("Message NOT sent")
 
     def control(self, msg):
+        msg = Float32MultiArray()
+        msg.data = [msg.speed, msg.angle]
         self.speed = msg.speed
         self.angle = msg.angle
         if self.speed >= 100:
