@@ -70,27 +70,29 @@ class tracking(Node):
             with self._depth_lock:
                 self._depth_image = None
     
-    def detect(self, im):
-        im0, img = preprocess(320, im)
+    def detect(self):
+        while 1:
+            if self._rgb_image:
+                im0, img = preprocess(320, self._rgb_image)
 
-        pred = self.model.run(self.output_names, {self.inputName: img})
-        pred = from_numpy(pred[0])
-        pred = pred.float()
-        pred = non_max_suppression(pred, self.threshold, 0.4)
-        pred_boxes = []
-        for det in pred:
-            if det is not None and len(det):
-                det[:, :4] = scale_coords(
-                    img.shape[2:], det[:, :4], im0.shape).round()
-                for *x, conf, cls_id in det:
-                    x1, y1 = int(x[0]), int(x[1])
-                    x2, y2 = int(x[2]), int(x[3])
-                    pred_boxes.append((x1, y1, x2, y2, conf))
+                pred = self.model.run(self.output_names, {self.inputName: img})
+                pred = from_numpy(pred[0])
+                pred = pred.float()
+                pred = non_max_suppression(pred, self.threshold, 0.4)
+                pred_boxes = []
+                for det in pred:
+                    if det is not None and len(det):
+                        det[:, :4] = scale_coords(
+                            img.shape[2:], det[:, :4], im0.shape).round()
+                        for *x, conf, cls_id in det:
+                            x1, y1 = int(x[0]), int(x[1])
+                            x2, y2 = int(x[2]), int(x[3])
+                            pred_boxes.append((x1, y1, x2, y2, conf))
 
 
-        msg = Float32MultiArray()
-        msg.data = pred_boxes
-        self.publisher_.publish(msg)
+                msg = Float32MultiArray()
+                msg.data = pred_boxes
+                self.publisher_.publish(msg)
         
 def main(arg=None):
     rclpy.init()
