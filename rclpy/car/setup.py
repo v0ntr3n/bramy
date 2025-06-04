@@ -12,6 +12,9 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/'+package_name+'/launch', ['launch/bramy.launch.py']),
     ],
+    package_data={
+        '': ['libs/*.so'],  # this includes .so in install
+    },
     install_requires=['setuptools'],
     zip_safe=True,
     author='Mikael Arguedas',
