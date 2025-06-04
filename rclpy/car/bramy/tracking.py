@@ -24,7 +24,7 @@ class tracking(Node):
         
         self.publisher_ = self.create_publisher(Float32MultiArray, 'cordinates', 1)
         self.bridge = CvBridge()
-        self.node.create_subscription(
+        self.create_subscription(
             Image,
             'color_image',
             self._rgb_callback,
@@ -32,7 +32,7 @@ class tracking(Node):
         )
 
         # Subscriber for depth image
-        self.node.create_subscription(
+        self.create_subscription(
             Image,
             'depth_image',
             self._depth_callback,
