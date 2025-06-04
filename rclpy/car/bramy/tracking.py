@@ -19,7 +19,7 @@ class tracking(Node):
         self.angle = 0
         self.get_logger().info("load model")
         self.model = ort.InferenceSession(
-            r"alexnet.onnx", providers=["CPUExecutionProvider"])
+            r"/home/a/Downloads/alexnet.onnx", providers=["CPUExecutionProvider"])
         self.get_logger().info("load model complete")
         
         self.publisher_ = self.create_publisher(Float32MultiArray, 'cordinates', 1)
