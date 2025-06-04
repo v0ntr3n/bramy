@@ -12,7 +12,7 @@ def generate_launch_description():
         Node(
             package='bramy',
             executable='get_control',
-            name='subscriber_node'
+            name='get_control_node'
         ),
         Node(
             package='bramy',

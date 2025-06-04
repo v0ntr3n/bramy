@@ -30,8 +30,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'subscriber_lambda = bramy.subscriber_lambda:main',
-            'publisher = bramy.publisher:main',
+            'camera_publisher = bramy.camera_publisher:main',
+            'get_control = bramy.get_control:main',
+            'tracking = bramy.tracking:main',
         ],
     },
 )
