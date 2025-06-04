@@ -6,9 +6,9 @@ import onnxruntime as ort
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 from std_msgs.msg import Float32MultiArray
-from utils.utils import from_numpy, non_max_suppression, preprocess, scale_coords
 
 import rclpy
+from bramy.utils.utils import from_numpy, non_max_suppression, preprocess, scale_coords
 from rclpy.node import Node
 
 

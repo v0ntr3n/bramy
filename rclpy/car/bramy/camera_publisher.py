@@ -3,9 +3,8 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 
 import rclpy
+from bramy.camera.astra_camera import Camera
 from rclpy.node import Node
-
-from .camera.astra_camera import Camera
 
 
 class CameraPublisher(Node):
