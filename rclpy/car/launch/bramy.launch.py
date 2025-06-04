@@ -11,7 +11,13 @@ def generate_launch_description():
         ),
         Node(
             package='bramy',
-            executable='subscriber_lambda',
+            executable='get_control',
+            name='subscriber_node'
+        ),
+        Node(
+            package='bramy',
+            executable='tracking',
             name='subscriber_node'
         )
+        
     ])
