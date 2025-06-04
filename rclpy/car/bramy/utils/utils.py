@@ -1,9 +1,8 @@
-import onnxruntime as ort
-import numpy as np
-import cv2
 import time
 
+import cv2
 import numpy as np
+import onnxruntime as ort
 import torch
 import torchvision
 
@@ -191,6 +190,17 @@ def non_max_suppression(
 
     return output
 
+
+def preprocess(img_size, img):
+    img0 = img.copy()
+    img = letterbox(img, (img_size, img_size), auto=False)[0]
+    im = img.transpose((2, 0, 1))[::-1]
+    im = np.ascontiguousarray(im)
+    im = torch.from_numpy(im).to('cpu').float()
+    im /= 255
+    if len(im.shape) == 3:
+        im = im[None]
+    return img0, im.cpu().numpy()
 
 def letterbox(im, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
     """Resizes and pads image to new_shape with stride-multiple constraints, returns resized image, ratio, padding."""

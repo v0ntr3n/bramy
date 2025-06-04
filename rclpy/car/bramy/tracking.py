@@ -3,10 +3,10 @@ import threading
 import cv2
 import numpy
 import onnxruntime as ort
-from bl_msg.msg import Control
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
-from utils import from_numpy, letterbox, non_max_suppression, scale_coords
+from std_msgs.msg import Float32MultiArray
+from utils.utils import from_numpy, non_max_suppression, preprocess, scale_coords
 
 import rclpy
 from rclpy.node import Node
@@ -22,7 +22,7 @@ class tracking(Node):
             r"alexnet.onnx", providers=["CPUExecutionProvider"])
         self.get_logger().info("load model complete")
         
-        self.publisher_ = self.create_publisher(Control, 'get_control', 1)
+        self.publisher_ = self.create_publisher(Float32MultiArray, 'cordinates', 1)
         self.bridge = CvBridge()
         self.node.create_subscription(
             Image,
@@ -39,7 +39,7 @@ class tracking(Node):
             1  # QoS: queue size
         )
         
-        threading.Thread(target=self.detect)
+        threading.Thread(target=self.detect, daemon=True).start()
 
     def _rgb_callback(self, msg):
         """
@@ -71,7 +71,7 @@ class tracking(Node):
                 self._depth_image = None
     
     def detect(self, im):
-        im0, img = self.preprocess(im)
+        im0, img = preprocess(320, im)
 
         pred = self.model.run(self.output_names, {self.inputName: img})
         pred = from_numpy(pred[0])
@@ -85,9 +85,12 @@ class tracking(Node):
                 for *x, conf, cls_id in det:
                     x1, y1 = int(x[0]), int(x[1])
                     x2, y2 = int(x[2]), int(x[3])
-                    pred_boxes.append(
-                        (x1, y1, x2, y2, conf))
-        return pred_boxes
+                    pred_boxes.append((x1, y1, x2, y2, conf))
+
+
+        msg = Float32MultiArray()
+        msg.data = pred_boxes
+        self.publisher_.publish(msg)
         
 def main(arg=None):
     rclpy.init()
