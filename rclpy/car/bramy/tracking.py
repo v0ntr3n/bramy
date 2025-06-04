@@ -21,7 +21,8 @@ class tracking(Node):
         self.model = ort.InferenceSession(
             r"/home/a/Downloads/alexnet.onnx", providers=["CPUExecutionProvider"])
         self.get_logger().info("load model complete")
-        
+        self._rgb_image = None
+        self._depth_image = None
         self.publisher_ = self.create_publisher(Float32MultiArray, 'cordinates', 1)
         self.bridge = CvBridge()
         self.create_subscription(
@@ -51,7 +52,7 @@ class tracking(Node):
             with self._rgb_lock:
                 self._rgb_image = cv_image
         except Exception as e:
-            self.node.get_logger().error(f'Error converting RGB image: {e}')
+            self.get_logger().error(f'Error converting RGB image: {e}')
             with self._rgb_lock:
                 self._rgb_image = None
 
@@ -66,7 +67,7 @@ class tracking(Node):
             with self._depth_lock:
                 self._depth_image = cv_image
         except Exception as e:
-            self.node.get_logger().error(f'Error converting Depth image: {e}')
+            self.get_logger().error(f'Error converting Depth image: {e}')
             with self._depth_lock:
                 self._depth_image = None
     
