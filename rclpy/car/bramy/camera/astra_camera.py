@@ -9,7 +9,7 @@ class Camera:
                  fps=30, 
                  width=640, 
                  height=480, 
-                 openni_libs='libs/'):
+                 openni_libs='/home/a/Downloads/libs'):
         #config default parameters.
         self.fps = fps
         self.width = width
@@ -22,7 +22,6 @@ class Camera:
         openni2.unload()
         
     def load(self):
-        try:
             #setting up openni and chose device.
             openni2.initialize(self.openni_libs)
             self.dev = openni2.Device.open_any()
@@ -52,8 +51,6 @@ class Camera:
             self.dev.set_image_registration_mode(
                 c_api.OniImageRegistrationMode.ONI_IMAGE_REGISTRATION_DEPTH_TO_COLOR
             )
-        except:
-            print('cannot load')
         
     def get_depth(self):
         frame = self.depth_stream.read_frame()
