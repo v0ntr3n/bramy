@@ -69,11 +69,9 @@ class PostProcessing(Node):
         return None
 
     def detect(self, cordinates):
-        prev_time = time.time()
         bboxes = cordinates.data
         
         if len(bboxes) == 0:
-            self.get_logger().info("No object!")
             self.trackerID = None
             self.TrackerPos = None
         else:
@@ -112,10 +110,7 @@ class PostProcessing(Node):
                 msg = Float32MultiArray()
                 msg.data = publicData
                 self.publisher_.publish(msg)
-        current_time = time.time()
-        fps = 1.0 / (current_time - prev_time)
-        prev_time = current_time
-        self.get_logger().info(str(fps))
+
         # cv2.imshow("frame", out_show)
         # if cv2.waitKey(1) & 0xFF == ord('q'):
         #     self.finish_detect()

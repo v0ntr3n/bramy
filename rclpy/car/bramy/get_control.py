@@ -28,7 +28,7 @@ class get_control(Node):
             self.bus.send(msg)
             # print(f"Message sent on {self.bus.channel_info}")
         except can.CanError:
-            print("Message NOT sent")
+            self.get_logger().info("Message NOT sent")
 
     def control(self, msg):
         speed, angle = msg.data
