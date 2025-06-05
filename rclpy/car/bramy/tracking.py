@@ -39,7 +39,6 @@ class tracking(Node):
             self._depth_callback,
             1  # QoS: queue size
         )
-        
         threading.Thread(target=self.detect, daemon=True).start()
 
     def _rgb_callback(self, msg):
@@ -49,12 +48,10 @@ class tracking(Node):
         """
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            with self._rgb_lock:
-                self._rgb_image = cv_image
+            self._rgb_image = cv_image
         except Exception as e:
             self.get_logger().error(f'Error converting RGB image: {e}')
-            with self._rgb_lock:
-                self._rgb_image = None
+            self._rgb_image = None
 
     def _depth_callback(self, msg):
         """
@@ -63,17 +60,16 @@ class tracking(Node):
         """
         try:
             # Use "passthrough" to retain the original format of the depth image (e.g., 16UC1, 32FC1)
-            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
-            with self._depth_lock:
-                self._depth_image = cv_image
+            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="mono16")
+            self._depth_image = cv_image
         except Exception as e:
             self.get_logger().error(f'Error converting Depth image: {e}')
-            with self._depth_lock:
-                self._depth_image = None
+            self._depth_image = None
     
     def detect(self):
         while 1:
             if self._rgb_image:
+                print("Getting image")
                 im0, img = preprocess(320, self._rgb_image)
 
                 pred = self.model.run(self.output_names, {self.inputName: img})
