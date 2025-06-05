@@ -79,7 +79,8 @@ class PostProcessing(Node):
             bboxes = np.array(bboxes, dtype=np.int32).reshape((num_detections, 6))
             # xywhs = torch.tensor(bboxes)
             depth_value = None
-            if len(bboxes) == 1:
+            self.get_logger().info(f"{bboxes.shape}")
+            if bboxes.shape[0] == 1:
                 multi = False
                 if bboxes[0][-2] < 0.4:
                     return
