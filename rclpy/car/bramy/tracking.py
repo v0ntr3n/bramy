@@ -56,7 +56,6 @@ class tracking(Node):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             self._rgb_image = cv_image
-            self.get_logger().info("Getting rgb image")
         except Exception as e:
             self.get_logger().error(f'Error converting RGB image: {e}')
             self._rgb_image = None
@@ -70,7 +69,6 @@ class tracking(Node):
             # Use "passthrough" to retain the original format of the depth image (e.g., 16UC1, 32FC1)
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="mono16")
             self._depth_image = cv_image
-            self.get_logger().info("Getting depth image")
         except Exception as e:
             self.get_logger().error(f'Error converting Depth image: {e}')
             self._depth_image = None
@@ -81,7 +79,6 @@ class tracking(Node):
                 if self._rgb_image is not None:
                     rgb_img = self._rgb_image.copy()
                     depth_img = self._depth_image.copy()
-                    self.get_logger().info("Getting2 image")
                     im0, img = preprocess(320, rgb_img)
                     pred = self.model.run(self.output_names, {self.inputName: img})
                     pred = from_numpy(pred[0])

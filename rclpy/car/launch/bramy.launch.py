@@ -18,6 +18,11 @@ def generate_launch_description():
             package='bramy',
             executable='tracking',
             name='subscriber_node'
+        ),
+        Node(
+            package='bramy',
+            executable='postProcess',
+            name='postProc'
         )
         
     ])

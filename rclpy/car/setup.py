@@ -36,6 +36,7 @@ setup(
             'camera_publisher = bramy.camera_publisher:main',
             'get_control = bramy.get_control:main',
             'tracking = bramy.tracking:main',
+            'postProcess = bramy.PostProcess:main',
         ],
     },
 )
