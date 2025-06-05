@@ -34,8 +34,8 @@ class get_control(Node):
         speed, angle = msg.data
         if speed == self.speed and angle == self.angle:
             return
-        # self.speed = msg.speed
-        # self.angle = msg.angle
+        self.speed = speed
+        self.angle = angle
         if self.speed >= 100:
             self.speed = 100
         if self.speed <= -100:

@@ -78,7 +78,7 @@ class PostProcessing(Node):
         else:
             num_detections = len(bboxes) // 6
             bboxes = np.array(bboxes, dtype=np.float32).reshape((num_detections, 6))
-            xywhs = torch.tensor(bboxes)
+            # xywhs = torch.tensor(bboxes)
             depth_value = None
             if len(bboxes) == 1:
                 multi = False
@@ -89,7 +89,7 @@ class PostProcessing(Node):
                     self.TrackerPos = (x1 + x2) // 2, (y1+y2) //2
             else:
                 multi = True
-                outputs = ocSort.update(xywhs, (640,480), (640,480)).astype(np.int32)
+                outputs = ocSort.update(bboxes, (640,480), (640,480)).astype(np.int32)
                 self.getCenterBox(outputs)
 
 
