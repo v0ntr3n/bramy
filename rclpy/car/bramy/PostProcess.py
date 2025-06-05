@@ -97,8 +97,8 @@ class PostProcessing(Node):
                 if depth_value is None:
                     depth_value = self.FindDistane(bboxes)
                 threshold_depth = 1000
-                person_x, person_y = self.TrackerPos
-                xc = (person_x - 320)/320
+                
+                xc = ((self.TrackerPos[0] + self.TrackerPos[2]) // 2 - 320)/320
                 xc = xc * 90
                 
                 angle = int(xc)
