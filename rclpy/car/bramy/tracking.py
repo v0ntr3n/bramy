@@ -39,12 +39,12 @@ class tracking(Node):
             1  # QoS: queue size
         )
 
-        self.create_subscription(
-            Image,
-            'depth_image',
-            self._depth_callback,
-            1  # QoS: queue size
-        )
+        # self.create_subscription(
+        #     Image,
+        #     'depth_image',
+        #     self._depth_callback,
+        #     1  # QoS: queue size
+        # )
         
         threading.Thread(target=self.detect, daemon=True).start()
 
@@ -60,25 +60,25 @@ class tracking(Node):
             self.get_logger().error(f'Error converting RGB image: {e}')
             self._rgb_image = None
 
-    def _depth_callback(self, msg):
-        """
-        Callback for the depth image topic.
-        Converts the ROS Image message to OpenCV format (passthrough).
-        """
-        try:
-            # Use "passthrough" to retain the original format of the depth image (e.g., 16UC1, 32FC1)
-            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="mono16")
-            self._depth_image = cv_image
-        except Exception as e:
-            self.get_logger().error(f'Error converting Depth image: {e}')
-            self._depth_image = None
+    # def _depth_callback(self, msg):
+    #     """
+    #     Callback for the depth image topic.
+    #     Converts the ROS Image message to OpenCV format (passthrough).
+    #     """
+    #     try:
+    #         # Use "passthrough" to retain the original format of the depth image (e.g., 16UC1, 32FC1)
+    #         cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="mono16")
+    #         self._depth_image = cv_image
+    #     except Exception as e:
+    #         self.get_logger().error(f'Error converting Depth image: {e}')
+    #         self._depth_image = None
     
     def detect(self):
         while 1:
             try:
                 if self._rgb_image is not None:
                     rgb_img = self._rgb_image.copy()
-                    depth_img = self._depth_image.copy()
+                    # depth_img = self._depth_image.copy()
                     im0, img = preprocess(320, rgb_img)
                     pred = self.model.run(self.output_names, {self.inputName: img})
                     pred = from_numpy(pred[0])
@@ -93,9 +93,9 @@ class tracking(Node):
                                 x1, y1 = int(x[0]), int(x[1])
                                 x2, y2 = int(x[2]), int(x[3])
 
-                                cx = int((x1 + x2) / 2)
-                                cy = int((y1 + y2) / 2)
-                                pred_boxes.append((x1, y1, x2, y2, conf, float(depth_img[cy, cx])))
+                                # cx = int((x1 + x2) / 2)
+                                # cy = int((y1 + y2) / 2)
+                                pred_boxes.append((x1, y1, x2, y2, conf))
                                 cv2.rectangle(rgb_img, (x1, y1), (x2, y2), (0,255,0), -1, cv2.LINE_AA)  # filled
 
                     cv2.imshow("123", rgb_img)

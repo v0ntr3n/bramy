@@ -24,7 +24,27 @@ class PostProcessing(Node):
         self.bridge = CvBridge()
         self.trackerID = None
         self.TrackerPos = None
-    
+        self.create_subscription(
+            Image,
+            'depth_image',
+            self._depth_callback,
+            1  # QoS: queue size
+        )
+        self._depth_image = None
+
+    def _depth_callback(self, msg):
+        """
+        Callback for the depth image topic.
+        Converts the ROS Image message to OpenCV format (passthrough).
+        """
+        try:
+            # Use "passthrough" to retain the original format of the depth image (e.g., 16UC1, 32FC1)
+            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="mono16")
+            self._depth_image = cv_image
+        except Exception as e:
+            self.get_logger().error(f'Error converting Depth image: {e}')
+            self._depth_image = None
+
     def getCenterBox(self, bboxes):
         tl = 1
         selecting = False
@@ -75,8 +95,8 @@ class PostProcessing(Node):
             self.trackerID = None
             self.TrackerPos = None
         else:
-            num_detections = len(bboxes) // 6
-            bboxes = np.array(bboxes, dtype=np.float32).reshape((num_detections, 6))
+            num_detections = len(bboxes) // 5
+            bboxes = np.array(bboxes, dtype=np.float32).reshape((num_detections, 5))
             # xywhs = torch.tensor(bboxes)
             depth_value = None
             self.get_logger().info(f"{bboxes.shape}")
@@ -85,7 +105,7 @@ class PostProcessing(Node):
                 if bboxes[0][-2] < 0.4:
                     return
                 else:
-                    x1, y1, x2, y2, conf, depth_value = bboxes[0]
+                    x1, y1, x2, y2, conf = bboxes[0]
                     self.TrackerPos = x1, x2, y1, y2
             else:
                 multi = True
@@ -95,8 +115,11 @@ class PostProcessing(Node):
 
 
             if self.TrackerPos is not None or (multi and self.TrackerPos):
-                if depth_value is None:
-                    depth_value = self.FindDistane(bboxes)
+                x1, x2, y1, y2 = self.TrackerPos
+
+
+
+                depth_value = self._depth_image[(y1 + y2) // 2, (x1+ x2) // 2]
                 threshold_depth = 1000
                 
                 xc = ((self.TrackerPos[0] + self.TrackerPos[2]) // 2 - 320)/320

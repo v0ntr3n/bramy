@@ -18,6 +18,8 @@ class get_control(Node):
                                                    'get_control', 
                                                    self.control, 
                                                    1)
+        
+        
     
     def set_value(self):
         data = struct.pack('>hh', int(self.speed), 90 + int(self.angle))
