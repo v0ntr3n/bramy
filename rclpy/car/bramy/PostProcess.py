@@ -12,53 +12,6 @@ import rclpy
 from bramy.ocsort.ocsort import OCSort
 from rclpy.node import Node
 
-#640 640
-trackerID = None
-TrackerPos = None
-
-def plot_bboxes(image, bboxes, line_thickness=None):
-    global trackerID, TrackerPos
-    # Plots one bounding box on image img
-    tl = 1
-
-
-    selecting = False
-    if not trackerID:
-        selecting = True
-        
-        centerX = image.shape[1] // 2
-        centerY = image.shape[0] // 2
-        maxDist = float('inf')
-    cls_id = 'person'
-    for (x1, y1, x2, y2, pos_id) in bboxes:
-        if int(pos_id) == trackerID:
-            TrackerPos = (x1 + x2) // 2, (y1+y2) //2
-            color = (255, 0, 255)
-            # print(color)
-        else:
-            color = (0, 255, 0)
-
-        c1, c2 = (x1, y1), (x2, y2)
-        cv2.rectangle(image, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
-        if selecting:
-            x_center = (x1 + x2) // 2
-            y_center = (y1 + y2) // 2
-            dist = ((centerX - x_center) ** 2 + (centerY - y_center) ** 2)**0.5
-            print(pos_id, dist)
-            if dist < maxDist:
-                trackerID = int(pos_id)
-                maxDist = dist
-
-        tf = max(tl - 1, 1)  # font thickness
-        t_size = cv2.getTextSize(cls_id, 0, fontScale=tl / 3, thickness=tf)[0]
-        c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 3
-        cv2.rectangle(image, c1, c2, color, -1, cv2.LINE_AA)  # filled
-        cv2.putText(image, '{} ID-{}'.format(cls_id, pos_id), (c1[0], c1[1] - 2), 0, tl / 3,
-                    [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
-
-
-    return image
-
 ocSort = OCSort()
 
         
@@ -109,7 +62,7 @@ class PostProcessing(Node):
     def FindDistane(self, bboxes):
         if self.TrackerPos:
             for x1, y1, x2, y2, cls_id, depth_value in bboxes:
-                if TrackerPos[0] == (x1 + x2) // 2 and TrackerPos[1] == (y1 + y2) // 2:
+                if self.TrackerPos[0] == (x1 + x2) // 2 and self.TrackerPos[1] == (y1 + y2) // 2:
                     return depth_value
 
         return None
