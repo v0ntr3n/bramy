@@ -83,8 +83,6 @@ class tracking(Node):
                     depth_img = self._depth_image.copy()
                     self.get_logger().info("Getting2 image")
                     im0, img = preprocess(320, rgb_img)
-                    cv2.imshow("123", rgb_img)
-                    cv2.waitKey(1)
                     pred = self.model.run(self.output_names, {self.inputName: img})
                     pred = from_numpy(pred[0])
                     pred = pred.float()
@@ -101,8 +99,10 @@ class tracking(Node):
                                 cx = int((x1 + x2) / 2)
                                 cy = int((y1 + y2) / 2)
                                 pred_boxes.append((x1, y1, x2, y2, conf, float(depth_img[cy, cx])))
+                                cv2.rectangle(rgb_img, (x1, y1), (x2, y2), (0,255,0), -1, cv2.LINE_AA)  # filled
 
-
+                    cv2.imshow("123", rgb_img)
+                    cv2.waitKey(1)
                     msg = Float32MultiArray()
                     msg.data = list(itertools.chain.from_iterable(pred_boxes))
                     self.publisher_.publish(msg)
