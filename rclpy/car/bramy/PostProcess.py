@@ -66,7 +66,7 @@ class PostProcessing(Node):
     def __init__(self):
         super().__init__('post_prcesss')
 
-        self.create_subscription(Image, 'cordinates', self.detect, 1)
+        self.create_subscription(Float32MultiArray, 'cordinates', self.detect, 1)
         self.publisher_ = self.create_publisher(Float32MultiArray, 'get_control', 1)
         self.bridge = CvBridge()
         self.trackerID = None
@@ -114,7 +114,6 @@ class PostProcessing(Node):
         xywhs = torch.tensor(bboxes)
         if not bboxes or len(bboxes) == 0:
             self.get_logger().info("No object!")
-            print("No object!")
             trackerID = None
             TrackerPos = None
         else:
