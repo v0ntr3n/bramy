@@ -14,7 +14,7 @@ class get_control(Node):
         self.speed = 0
         self.angle = 90
         self.set_value()
-        self.subcriber_ = self.create_subscription(Float32MultiArray, 
+        self.create_subscription(Float32MultiArray, 
                                                    'get_control', 
                                                    self.control, 
                                                    1)

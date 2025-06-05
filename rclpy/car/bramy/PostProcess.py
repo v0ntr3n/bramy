@@ -84,11 +84,12 @@ class PostProcessing(Node):
                 if bboxes[0][-2] < 0.4:
                     return
                 else:
-                    x1, y1, x2, y2, cls_id, depth_value = bboxes[0]
+                    x1, y1, x2, y2, conf, depth_value = bboxes[0]
                     self.TrackerPos = x1, x2, y1, y2
             else:
                 multi = True
                 outputs = ocSort.update(bboxes.astype(np.float32), (640,480), (640,480)).astype(np.int32)
+                self.get_logger().info(f"{outputs}")
                 self.getCenterBox(outputs)
 
 
