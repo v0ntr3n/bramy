@@ -110,7 +110,6 @@ class PostProcessing(Node):
             else:
                 multi = True
                 outputs = ocSort.update(bboxes, (640,480), (640,480))
-                self.get_logger().info(f"{outputs}")
                 self.getCenterBox(outputs)
 
 
@@ -118,7 +117,7 @@ class PostProcessing(Node):
                 x1, x2, y1, y2 = self.TrackerPos
 
 
-                c1, c2 = ((y1 + y2) // 2), ((x1+ x2) // 2)
+                c1, c2 = int((y1 + y2) // 2), int((x1+ x2) // 2)
                 depth_value = self._depth_image[c1, c2]
                 threshold_depth = 1000
                 
