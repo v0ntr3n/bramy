@@ -40,7 +40,8 @@ class PostProcessing(Node):
         try:
             # Use "passthrough" to retain the original format of the depth image (e.g., 16UC1, 32FC1)
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="mono16")
-            self._depth_image = cv_image
+            self._depth_image = cv2.flip(cv_image, 1)
+
         except Exception as e:
             self.get_logger().error(f'Error converting Depth image: {e}')
             self._depth_image = None

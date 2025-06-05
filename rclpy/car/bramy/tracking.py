@@ -55,7 +55,7 @@ class tracking(Node):
         Converts the ROS Image message to OpenCV format (BGR8).
         """
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg, "rgb8")
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             self._rgb_image = cv_image
         except Exception as e:
             self.get_logger().error(f'Error converting RGB image: {e}')
@@ -80,6 +80,7 @@ class tracking(Node):
             try:
                 if self._rgb_image is not None:
                     rgb_img = self._rgb_image.copy()
+                    rgb_img = cv2.flip(rgb_img, 1)
                     # depth_img = self._depth_image.copy()
                     im0, img = preprocess(320, rgb_img)
                     pred = self.model.run(self.output_names, {self.inputName: img})
@@ -110,7 +111,7 @@ class tracking(Node):
             current_time = time.time()
             fps = 1.0 / (current_time - prev_time)
             prev_time = current_time
-            self.get_logger().error(f'Error converting RGB image: {fps}')
+            self.get_logger().info(f'FPS : {fps}')
 
 def main(arg=None):
     rclpy.init()
