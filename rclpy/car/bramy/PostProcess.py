@@ -112,8 +112,8 @@ class PostProcessing(Node):
         
         if len(bboxes) == 0:
             self.get_logger().info("No object!")
-            trackerID = None
-            TrackerPos = None
+            self.trackerID = None
+            self.TrackerPos = None
         else:
             num_detections = len(bboxes) // 6
             bboxes = np.array(bboxes, dtype=np.float32).reshape((num_detections, 6))
@@ -124,16 +124,16 @@ class PostProcessing(Node):
                     return
                 else:
                     x1, y1, x2, y2, cls_id, depth_value = bboxes[0]
-                    TrackerPos = (x1 + x2) // 2, (y1+y2) //2
+                    self.TrackerPos = (x1 + x2) // 2, (y1+y2) //2
             else:
                 multi = True
                 outputs = ocSort.update(xywhs, (640,480), (640,480)).astype(np.int32)
                 self.getCenterBox(outputs)
             
 
-            if TrackerPos is not None or (multi and TrackerPos):
+            if self.TrackerPos is not None or (multi and self.TrackerPos):
                 threshold_depth = 1000
-                person_x, person_y = TrackerPos
+                person_x, person_y = self.TrackerPos
                 xc = (person_x - 320)/320
                 xc = xc * 90
 
