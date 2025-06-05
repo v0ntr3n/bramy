@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 import onnxruntime as ort
 import torch
-from bl_msg.msg import Control
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 from std_msgs.msg import Float32MultiArray
@@ -68,7 +67,7 @@ class PostProcessing(Node):
         super().__init__('post_prcesss')
 
         self.create_subscription(Image, 'cordinates', self.detect, 1)
-        self.publisher_ = self.create_publisher(Control, 'get_control', 1)
+        self.publisher_ = self.create_publisher(Float32MultiArray, 'get_control', 1)
         self.bridge = CvBridge()
         self.trackerID = None
         self.TrackerPos = None
@@ -111,18 +110,21 @@ class PostProcessing(Node):
         prev_time = time.time()
         bboxes = cordinates.data
         xywhs = torch.tensor(bboxes)
-        if not bboxes:
+        if not bboxes or len(bboxes) == 0:
+            self.get_logger().info("No object!")
             print("No object!")
             trackerID = None
             TrackerPos = None
         else:
             if len(bboxes) == 1:
+                multi = False
                 if bboxes[0][-2] < 0.4:
                     return
                 else:
                     x1, y1, x2, y2, cls_id, depth_value = bboxes[0]
                     TrackerPos = (x1 + x2) // 2, (y1+y2) //2
             else:
+                multi = True
                 outputs = ocSort.update(xywhs, (640,480), (640,480)).astype(np.int32)
                 self.getCenterBox(outputs)
             
@@ -133,33 +135,30 @@ class PostProcessing(Node):
                 xc = (person_x - 320)/320
                 xc = xc * 90
 
-
+                angle = int(xc)
                 if depth_value < threshold_depth:
-                    msg.speed = 0
+                    speed = 0
                 else:
-                    msg.speed = 5
-                    msg.angle = int(xc)
-                    self.angle = int(xc)
-                    self.publisher_.publish(msg)
-                else:
-                    msg.speed = 0
-                    msg.angle = self.angle
-                    self.publisher_.publish(msg)
+                    speed = 5
 
+                publicData = [speed, angle]
+                msg = Float32MultiArray()
+                msg.data = publicData
+                self.publisher_.publish(msg)
         current_time = time.time()
         fps = 1.0 / (current_time - prev_time)
         prev_time = current_time
-        print(fps)
-        cv2.imshow("frame", out_show)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            self.finish_detect()
-            break
+        self.get_logger().info(str(fps))
+        # cv2.imshow("frame", out_show)
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     self.finish_detect()
+        #     break
         
 
 
 def main(arg=None):
     rclpy.init()
-    node = PosProcessing()
+    node = PostProcessing()
     rclpy.spin(node)
     rclpy.shutdown()
 
