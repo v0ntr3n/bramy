@@ -78,7 +78,7 @@ class PostProcessing(Node):
             self.TrackerPos = None
         else:
             num_detections = len(bboxes) // 6
-            bboxes = np.array(bboxes, dtype=np.float32).reshape((num_detections, 6))
+            bboxes = np.array(bboxes, dtype=np.int32).reshape((num_detections, 6))
             # xywhs = torch.tensor(bboxes)
             depth_value = None
             if len(bboxes) == 1:
