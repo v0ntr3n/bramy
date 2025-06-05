@@ -39,6 +39,8 @@ class tracking(Node):
             self._depth_callback,
             1  # QoS: queue size
         )
+        self.output_names = [x.name for x in self.model.get_outputs()]
+        self.inputName = self.model.get_inputs()[0].name
         threading.Thread(target=self.detect, daemon=True).start()
 
     def _rgb_callback(self, msg):
@@ -68,8 +70,8 @@ class tracking(Node):
     
     def detect(self):
         while 1:
-            if self._rgb_image != None:
-                print("Getting image")
+            if self._rgb_image is not None:
+                self.get_logger().error("Getting image")
                 im0, img = preprocess(320, self._rgb_image)
 
                 pred = self.model.run(self.output_names, {self.inputName: img})
