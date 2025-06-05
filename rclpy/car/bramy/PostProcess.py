@@ -28,7 +28,7 @@ class PostProcessing(Node):
     def getCenterBox(self, bboxes):
         tl = 1
         selecting = False
-        if not self.trackerID:
+        if self.trackerID is None:
             selecting = True
             centerX = 640 // 2
             centerY = 480 // 2
@@ -39,7 +39,7 @@ class PostProcessing(Node):
             if int(pos_id) == self.trackerID:
                 self.TrackerPos = x1, x2, y1, y2
                 color = (255, 0, 255)
-                # print(color)
+                # self.get_logger().info(color)
             else:
                 color = (0, 255, 0)
 
@@ -49,7 +49,7 @@ class PostProcessing(Node):
                 x_center = (x1 + x2) // 2
                 y_center = (y1 + y2) // 2
                 dist = ((centerX - x_center) ** 2 + (centerY - y_center) ** 2)**0.5
-                print(pos_id, dist)
+                self.get_logger().info(f'{pos_id}, {dist}')
                 if dist < maxDist:
                     self.trackerID = int(pos_id)
                     self.TrackerPos = x1, x2, y1, y2
@@ -62,6 +62,7 @@ class PostProcessing(Node):
     def FindDistane(self, bboxes):
         if self.TrackerPos:
             for x1, y1, x2, y2, cls_id, depth_value in bboxes:
+                self.get_logger().info(f"{self.TrackerPos} {x1}, {x2}, {y1}, {y2}")
                 if self.TrackerPos == (x1, x2, y1, y2):
                     return depth_value
 
