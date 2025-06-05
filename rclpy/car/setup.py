@@ -5,7 +5,7 @@ package_name = 'bramy'
 setup(
     name=package_name,
     version='0.19.5',
-    packages=[package_name, f'{package_name}.camera', f'{package_name}.utils'],
+    packages=[package_name, f'{package_name}.camera', f'{package_name}.utils', f'{package_name}.ocsort'],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),

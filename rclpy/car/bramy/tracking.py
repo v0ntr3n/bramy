@@ -75,8 +75,10 @@ class tracking(Node):
         while 1:
             try:
                 if self._rgb_image is not None:
+                    rgb_img = self._rgb_image.copy()
+                    depth_img = self._depth_image.copy()
                     self.get_logger().error("Getting image")
-                    im0, img = preprocess(320, self._rgb_image)
+                    im0, img = preprocess(320, rgb_img)
 
                     pred = self.model.run(self.output_names, {self.inputName: img})
                     pred = from_numpy(pred[0])
@@ -90,13 +92,16 @@ class tracking(Node):
                             for *x, conf, cls_id in det:
                                 x1, y1 = int(x[0]), int(x[1])
                                 x2, y2 = int(x[2]), int(x[3])
-                                pred_boxes.append((x1, y1, x2, y2, conf))
+
+                                cx = int((x1 + x2) / 2)
+                                cy = int((y1 + y2) / 2)
+                                pred_boxes.append((x1, y1, x2, y2, conf, float(depth_img[cy, cx])))
 
 
                     msg = Float32MultiArray()
                     msg.data = pred_boxes
                     self.publisher_.publish(msg)
-            except:
+            except:  # noqa: E722
                 print_exc()
         
 def main(arg=None):

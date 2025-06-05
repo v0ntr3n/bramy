@@ -31,8 +31,7 @@ class get_control(Node):
             print("Message NOT sent")
 
     def control(self, msg):
-        msg = Float32MultiArray()
-        msg.data = [msg.speed, msg.angle]
+        speed, angle = msg.data
         self.speed = msg.speed
         self.angle = msg.angle
         if self.speed >= 100:
