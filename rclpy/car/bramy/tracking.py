@@ -1,3 +1,4 @@
+import itertools
 import threading
 from traceback import print_exc
 
@@ -101,7 +102,7 @@ class tracking(Node):
 
 
                     msg = Float32MultiArray()
-                    msg.data = pred_boxes
+                    msg.data = list(itertools.chain.from_iterable(pred_boxes))
                     self.publisher_.publish(msg)
             except:  # noqa: E722
                 print_exc()

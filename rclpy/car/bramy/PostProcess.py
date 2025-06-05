@@ -109,6 +109,8 @@ class PostProcessing(Node):
     def detect(self, cordinates):
         prev_time = time.time()
         bboxes = cordinates.data
+        num_detections = len(bboxes) // 6
+        bboxes = np.array(bboxes, dtype=np.float32).reshape((num_detections, 6))
         xywhs = torch.tensor(bboxes)
         if not bboxes or len(bboxes) == 0:
             self.get_logger().info("No object!")
@@ -129,7 +131,7 @@ class PostProcessing(Node):
                 self.getCenterBox(outputs)
             
 
-            if TrackerPos != None or (multi and TrackerPos):
+            if TrackerPos is not None or (multi and TrackerPos):
                 threshold_depth = 1000
                 person_x, person_y = TrackerPos
                 xc = (person_x - 320)/320
