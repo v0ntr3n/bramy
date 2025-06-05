@@ -208,10 +208,6 @@ class OCSort(object):
         self.frame_count += 1
         # post_process detections
         scores = output_results[:, 4]
-        # bboxes = output_results[:, :4]
-        # img_h, img_w = img_info[0], img_info[1]
-        # scale = min(img_size[0] / float(img_h), img_size[1] / float(img_w))
-        # bboxes /= scale
         dets = output_results
         # inds_low = scores > 0.1
         # inds_high = scores < self.det_thresh
