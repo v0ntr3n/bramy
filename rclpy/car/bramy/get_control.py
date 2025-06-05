@@ -32,6 +32,7 @@ class get_control(Node):
 
     def control(self, msg):
         speed, angle = msg.data
+        self.get_logger().info(f"{speed}, {angle}")
         if speed == self.speed and angle == self.angle:
             return
         self.speed = speed
