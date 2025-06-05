@@ -23,6 +23,7 @@ class Camera:
         
     def load(self):
             #setting up openni and chose device.
+            print(123)
             openni2.initialize(self.openni_libs)
             self.dev = openni2.Device.open_any()
             # init depth stream.
@@ -55,16 +56,15 @@ class Camera:
     def get_depth(self):
         frame = self.depth_stream.read_frame()
         frame_data = frame.get_buffer_as_uint16()
-        return frame_data
         img = np.ndarray((frame.height, frame.width), dtype=np.uint16, buffer=frame_data)
         return img
     
     def get_color(self):
         frame = self.color_stream.read_frame()
         frame_data = frame.get_buffer_as_uint8()
+        colorPix = np.frombuffer(frame_data, dtype=np.uint8)
+        colorPix.shape = (self.height, self.width, 3)
         return frame_data
-        # colorPix = np.frombuffer(frame_data, dtype=np.uint8)
-        # colorPix.shape = (self.height, self.width, 3)
     
     def get_depth_and_color(self):
         return self.get_depth(), self.get_color()

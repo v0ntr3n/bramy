@@ -10,11 +10,15 @@ from rclpy.node import Node
 class CameraPublisher(Node):
     def __init__(self):
         super().__init__('camera_publisher')
+        self.get_logger().error('Start')
         self.bridge = CvBridge()
+        self.get_logger().error('Start2')
         self.camera = Camera()
+        self.get_logger().error('Start3')
         self.color_pub = self.create_publisher(Image, 'color_image', 1)
         self.depth_pub = self.create_publisher(Image, 'depth_image', 1)
         self.timer = self.create_timer(1.0 / 28.0, self.timer_callback)
+        self.get_logger().error('Start')
 
     def timer_callback(self):
         try:
