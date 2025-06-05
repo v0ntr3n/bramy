@@ -1,4 +1,5 @@
 import threading
+from traceback import print_exc
 
 import onnxruntime as ort
 from cv_bridge import CvBridge
@@ -72,28 +73,31 @@ class tracking(Node):
     
     def detect(self):
         while 1:
-            if self._rgb_image is not None:
-                self.get_logger().error("Getting image")
-                im0, img = preprocess(320, self._rgb_image)
+            try:
+                if self._rgb_image is not None:
+                    self.get_logger().error("Getting image")
+                    im0, img = preprocess(320, self._rgb_image)
 
-                pred = self.model.run(self.output_names, {self.inputName: img})
-                pred = from_numpy(pred[0])
-                pred = pred.float()
-                pred = non_max_suppression(pred, self.threshold, 0.4)
-                pred_boxes = []
-                for det in pred:
-                    if det is not None and len(det):
-                        det[:, :4] = scale_coords(
-                            img.shape[2:], det[:, :4], im0.shape).round()
-                        for *x, conf, cls_id in det:
-                            x1, y1 = int(x[0]), int(x[1])
-                            x2, y2 = int(x[2]), int(x[3])
-                            pred_boxes.append((x1, y1, x2, y2, conf))
+                    pred = self.model.run(self.output_names, {self.inputName: img})
+                    pred = from_numpy(pred[0])
+                    pred = pred.float()
+                    pred = non_max_suppression(pred, self.threshold, 0.4)
+                    pred_boxes = []
+                    for det in pred:
+                        if det is not None and len(det):
+                            det[:, :4] = scale_coords(
+                                img.shape[2:], det[:, :4], im0.shape).round()
+                            for *x, conf, cls_id in det:
+                                x1, y1 = int(x[0]), int(x[1])
+                                x2, y2 = int(x[2]), int(x[3])
+                                pred_boxes.append((x1, y1, x2, y2, conf))
 
 
-                msg = Float32MultiArray()
-                msg.data = pred_boxes
-                self.publisher_.publish(msg)
+                    msg = Float32MultiArray()
+                    msg.data = pred_boxes
+                    self.publisher_.publish(msg)
+            except:
+                print_exc()
         
 def main(arg=None):
     rclpy.init()
