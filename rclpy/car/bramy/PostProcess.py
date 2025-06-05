@@ -75,7 +75,7 @@ class PostProcessing(Node):
     def getCenterBox(self, bboxes):
         tl = 1
         selecting = False
-        if not trackerID:
+        if not self.trackerID:
             selecting = True
             centerX = 640 // 2
             centerY = 480 // 2
@@ -83,7 +83,7 @@ class PostProcessing(Node):
 
 
         for (x1, y1, x2, y2, pos_id) in bboxes:
-            if int(pos_id) == trackerID:
+            if int(pos_id) == self.trackerID:
                 self.TrackerPos = (x1 + x2) // 2, (y1+y2) //2
                 color = (255, 0, 255)
                 # print(color)
@@ -106,6 +106,14 @@ class PostProcessing(Node):
             # cv2.putText(image, '{} ID-{}'.format(cls_id, pos_id), (c1[0], c1[1] - 2), 0, 1,
             #             [225, 255, 255], thickness=1, lineType=cv2.LINE_AA)
 
+    def FindDistane(self, bboxes):
+        if self.TrackerPos:
+            for x1, y1, x2, y2, cls_id, depth_value in bboxes:
+                if TrackerPos[0] == (x1 + x2) // 2 and TrackerPos[1] == (y1 + y2) // 2:
+                    return depth_value
+
+        return None
+
     def detect(self, cordinates):
         prev_time = time.time()
         bboxes = cordinates.data
@@ -118,6 +126,7 @@ class PostProcessing(Node):
             num_detections = len(bboxes) // 6
             bboxes = np.array(bboxes, dtype=np.float32).reshape((num_detections, 6))
             xywhs = torch.tensor(bboxes)
+            depth_value = None
             if len(bboxes) == 1:
                 multi = False
                 if bboxes[0][-2] < 0.4:
@@ -129,14 +138,16 @@ class PostProcessing(Node):
                 multi = True
                 outputs = ocSort.update(xywhs, (640,480), (640,480)).astype(np.int32)
                 self.getCenterBox(outputs)
-            
+
 
             if self.TrackerPos is not None or (multi and self.TrackerPos):
+                if depth_value is None:
+                    depth_value = self.FindDistane(bboxes)
                 threshold_depth = 1000
                 person_x, person_y = self.TrackerPos
                 xc = (person_x - 320)/320
                 xc = xc * 90
-
+                
                 angle = int(xc)
                 if depth_value < threshold_depth:
                     speed = 0
