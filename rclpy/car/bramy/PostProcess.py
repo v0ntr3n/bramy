@@ -37,7 +37,7 @@ class PostProcessing(Node):
 
         for (x1, y1, x2, y2, pos_id) in bboxes:
             if int(pos_id) == self.trackerID:
-                self.TrackerPos = (x1 + x2) // 2, (y1+y2) //2
+                self.TrackerPos = x1, x2, y1, y2
                 color = (255, 0, 255)
                 # print(color)
             else:
@@ -52,7 +52,7 @@ class PostProcessing(Node):
                 print(pos_id, dist)
                 if dist < maxDist:
                     self.trackerID = int(pos_id)
-                    self.TrackerPos = (x1 + x2) // 2, (y1+y2) //2
+                    self.TrackerPos = x1, x2, y1, y2
                     maxDist = dist
 
 
@@ -62,7 +62,7 @@ class PostProcessing(Node):
     def FindDistane(self, bboxes):
         if self.TrackerPos:
             for x1, y1, x2, y2, cls_id, depth_value in bboxes:
-                if self.TrackerPos[0] == (x1 + x2) // 2 and self.TrackerPos[1] == (y1 + y2) // 2:
+                if self.TrackerPos == (x1, x2, y1, y2):
                     return depth_value
 
         return None
@@ -86,7 +86,7 @@ class PostProcessing(Node):
                     return
                 else:
                     x1, y1, x2, y2, cls_id, depth_value = bboxes[0]
-                    self.TrackerPos = (x1 + x2) // 2, (y1+y2) //2
+                    self.TrackerPos = x1, x2, y1, y2
             else:
                 multi = True
                 outputs = ocSort.update(bboxes, (640,480), (640,480)).astype(np.int32)
