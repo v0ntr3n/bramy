@@ -118,8 +118,8 @@ class PostProcessing(Node):
                 x1, x2, y1, y2 = self.TrackerPos
 
 
-
-                depth_value = self._depth_image[(y1 + y2) // 2, (x1+ x2) // 2]
+                c1, c2 = ((y1 + y2) // 2), ((x1+ x2) // 2)
+                depth_value = self._depth_image[c1, c2]
                 threshold_depth = 1000
                 
                 xc = ((self.TrackerPos[0] + self.TrackerPos[2]) // 2 - 320)/320
