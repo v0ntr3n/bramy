@@ -1,5 +1,6 @@
 import itertools
 import threading
+import time
 from traceback import print_exc
 
 import cv2
@@ -75,6 +76,7 @@ class tracking(Node):
     
     def detect(self):
         while 1:
+            prev_time = time.time()
             try:
                 if self._rgb_image is not None:
                     rgb_img = self._rgb_image.copy()
@@ -105,7 +107,11 @@ class tracking(Node):
                     self.publisher_.publish(msg)
             except:  # noqa: E722
                 print_exc()
-        
+            current_time = time.time()
+            fps = 1.0 / (current_time - prev_time)
+            prev_time = current_time
+            self.get_logger().error(f'Error converting RGB image: {fps}')
+
 def main(arg=None):
     rclpy.init()
     node = tracking()
