@@ -64,7 +64,7 @@ class Camera:
         frame_data = frame.get_buffer_as_uint8()
         colorPix = np.frombuffer(frame_data, dtype=np.uint8)
         colorPix.shape = (self.height, self.width, 3)
-        return frame_data
+        return colorPix
     
     def get_depth_and_color(self):
         return self.get_depth(), self.get_color()

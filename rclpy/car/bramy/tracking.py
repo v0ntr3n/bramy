@@ -68,7 +68,7 @@ class tracking(Node):
     
     def detect(self):
         while 1:
-            if self._rgb_image:
+            if self._rgb_image != None:
                 print("Getting image")
                 im0, img = preprocess(320, self._rgb_image)
 
