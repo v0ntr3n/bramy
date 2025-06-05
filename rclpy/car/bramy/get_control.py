@@ -20,7 +20,7 @@ class get_control(Node):
                                                    1)
     
     def set_value(self):
-        data = struct.pack('>hh', self.speed, 90 + self.angle)
+        data = struct.pack('>hh', int(self.speed), 90 + int(self.angle))
         msg = can.Message(
             arbitration_id=0x21, data=data, is_extended_id=False
         )
