@@ -105,6 +105,7 @@ class PostProcessing(Node):
                     speed = 0
                 else:
                     speed = 5
+                self.get_logger().info(f"{speed}, {angle}")
 
                 publicData = [speed, angle]
                 msg = Float32MultiArray()
