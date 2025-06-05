@@ -1,7 +1,5 @@
 import threading
 
-import cv2
-import numpy
 import onnxruntime as ort
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
@@ -23,8 +21,14 @@ class tracking(Node):
         self.get_logger().info("load model complete")
         self._rgb_image = None
         self._depth_image = None
-        self.publisher_ = self.create_publisher(Float32MultiArray, 'cordinates', 1)
         self.bridge = CvBridge()
+        self.output_names = [x.name for x in self.model.get_outputs()]
+        self.inputName = self.model.get_inputs()[0].name
+        self.threshold = 0.3
+
+
+
+        self.publisher_ = self.create_publisher(Float32MultiArray, 'cordinates', 1)
         self.create_subscription(
             Image,
             'color_image',
@@ -32,15 +36,13 @@ class tracking(Node):
             1  # QoS: queue size
         )
 
-        # Subscriber for depth image
         self.create_subscription(
             Image,
             'depth_image',
             self._depth_callback,
             1  # QoS: queue size
         )
-        self.output_names = [x.name for x in self.model.get_outputs()]
-        self.inputName = self.model.get_inputs()[0].name
+        
         threading.Thread(target=self.detect, daemon=True).start()
 
     def _rgb_callback(self, msg):
