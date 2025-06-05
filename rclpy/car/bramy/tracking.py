@@ -84,7 +84,7 @@ class tracking(Node):
                     self.get_logger().info("Getting2 image")
                     im0, img = preprocess(320, rgb_img)
                     cv2.imshow("123", rgb_img)
-                    cv2.waitKey("123")
+                    cv2.waitKey(1)
                     pred = self.model.run(self.output_names, {self.inputName: img})
                     pred = from_numpy(pred[0])
                     pred = pred.float()
