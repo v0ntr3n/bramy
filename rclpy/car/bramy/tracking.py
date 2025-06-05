@@ -21,7 +21,7 @@ class tracking(Node):
         self.angle = 0
         self.get_logger().info("load model")
         self.model = ort.InferenceSession(
-            r"/home/a/Downloads/alexnet.onnx", providers=["CPUExecutionProvider"])
+            r"/home/pi/Downloads/alexnet.onnx", providers=["CPUExecutionProvider"])
         self.get_logger().info("load model complete")
         self._rgb_image = None
         self._depth_image = None

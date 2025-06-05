@@ -9,7 +9,7 @@ class Camera:
                  fps=30, 
                  width=640, 
                  height=480, 
-                 openni_libs='/home/a/Downloads/libs'):
+                 openni_libs='/home/pi/Downloads/libs'):
         #config default parameters.
         self.fps = fps
         self.width = width
