@@ -109,14 +109,15 @@ class PostProcessing(Node):
     def detect(self, cordinates):
         prev_time = time.time()
         bboxes = cordinates.data
-        num_detections = len(bboxes) // 6
-        bboxes = np.array(bboxes, dtype=np.float32).reshape((num_detections, 6))
-        xywhs = torch.tensor(bboxes)
-        if not bboxes or len(bboxes) == 0:
+        
+        if len(bboxes) == 0:
             self.get_logger().info("No object!")
             trackerID = None
             TrackerPos = None
         else:
+            num_detections = len(bboxes) // 6
+            bboxes = np.array(bboxes, dtype=np.float32).reshape((num_detections, 6))
+            xywhs = torch.tensor(bboxes)
             if len(bboxes) == 1:
                 multi = False
                 if bboxes[0][-2] < 0.4:
