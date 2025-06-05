@@ -90,7 +90,7 @@ class PostProcessing(Node):
                     self.TrackerPos = x1, x2, y1, y2
             else:
                 multi = True
-                outputs = ocSort.update(bboxes, (640,480), (640,480)).astype(np.int32)
+                outputs = ocSort.update(bboxes.astype(np.float32), (640,480), (640,480)).astype(np.int32)
                 self.getCenterBox(outputs)
 
 
