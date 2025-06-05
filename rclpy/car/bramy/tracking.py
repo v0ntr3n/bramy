@@ -55,7 +55,7 @@ class tracking(Node):
         Converts the ROS Image message to OpenCV format (BGR8).
         """
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "rgb8")
             self._rgb_image = cv_image
         except Exception as e:
             self.get_logger().error(f'Error converting RGB image: {e}')
